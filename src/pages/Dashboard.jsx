@@ -111,7 +111,7 @@ const Dashboard = () => {
       </div>
 
       {/* Actions rapides */}
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <button 
           onClick={() => window.location.href = '/levels'}
           className="w-full py-4 bg-yellow-500 text-black rounded-xl font-bold flex items-center justify-between px-5 active:scale-[0.98] transition"
@@ -135,7 +135,7 @@ const Dashboard = () => {
           <span>🏆 Voir le classement</span>
           <ChevronRight className="w-5 h-5" />
         </button>
-      </div>
+      </div> */}
 
       {/* Citation du jour */}
       <div className="bg-[#151820] border border-[#2a2e3a] rounded-xl p-4 text-center">
