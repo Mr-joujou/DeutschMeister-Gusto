@@ -9,6 +9,10 @@ const EXERCISE_TYPES = [
   'article', 'adjective', 'conjugation', 'modal', 'passive', 'wordorder', 'participial'
 ];
 
+// Nombre d'exercices par niveau
+const EXERCISES_PER_LEVEL = 5;
+const REQUIRED_SUCCESS_RATE = 0.8; // 80%
+
 export const UserProvider = ({ children }) => {
   // Structure de données unifiée
   const [userData, setUserData] = useState({
@@ -30,7 +34,7 @@ export const UserProvider = ({ children }) => {
 
   // Initialisation
   useEffect(() => {
-    const saved = localStorage.getItem('deutschmeister_user_v5');
+    const saved = localStorage.getItem('deutschmeister_user_v6');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -38,7 +42,6 @@ export const UserProvider = ({ children }) => {
         if (!parsed.userName) {
           setShowNameModal(true);
         }
-        // Appliquer le thème
         applyTheme(parsed.theme || 'dark');
       } catch (e) {
         console.error("Parse error:", e);
@@ -91,9 +94,15 @@ export const UserProvider = ({ children }) => {
   // Sauvegarde
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem('deutschmeister_user_v5', JSON.stringify(userData));
+      localStorage.setItem('deutschmeister_user_v6', JSON.stringify(userData));
     }
   }, [userData, isLoading]);
+
+  // Sauvegarde d'urgence (en cas d'erreur)
+  const emergencySave = () => {
+    localStorage.setItem('deutschmeister_user_v6_emergency', JSON.stringify(userData));
+    console.log('💾 Sauvegarde d\'urgence effectuée');
+  };
 
   // Vérifier si un niveau est débloqué (80% au précédent)
   const isLevelUnlocked = (exerciseType, level) => {
@@ -124,7 +133,7 @@ export const UserProvider = ({ children }) => {
         totalAnswers += level.total || 0;
       });
     });
-    const globalLevel = Math.min(Math.floor(totalAnswers / 50) + 1, 50);
+    const globalLevel = Math.min(Math.floor(totalAnswers / EXERCISES_PER_LEVEL) + 1, 50);
     return { globalLevel, totalCorrect, totalAnswers };
   };
 
@@ -215,8 +224,8 @@ export const UserProvider = ({ children }) => {
     let newXp = userData.xp + (isCorrect ? (currentLevel <= 15 ? 10 : currentLevel <= 35 ? 15 : 20) : 0);
     let newStreak = isCorrect ? userData.streak + 1 : 0;
 
-    // Vérifier passage niveau supérieur (80% et au moins 10 exercices)
-    if (newTotal >= 10 && (newCorrect / newTotal) >= 0.8 && currentLevel < 50) {
+    // ✅ CORRECTION : 5 exercices par niveau (80% = 4/5)
+    if (newTotal >= EXERCISES_PER_LEVEL && (newCorrect / newTotal) >= REQUIRED_SUCCESS_RATE && currentLevel < 50) {
       newLevel = currentLevel + 1;
       newXp += 50;
       showNotification(`🎉 Niveau ${newLevel} débloqué pour ${exerciseType} !`, 'success');
@@ -224,7 +233,7 @@ export const UserProvider = ({ children }) => {
 
     // Calcul du niveau global pour le Navbar
     const globalStats = getGlobalProgress();
-    const newGlobalLevel = Math.min(Math.floor((globalStats.totalAnswers + 1) / 50) + 1, 50);
+    const newGlobalLevel = Math.min(Math.floor((globalStats.totalAnswers + 1) / EXERCISES_PER_LEVEL) + 1, 50);
 
     setUserData(prev => ({
       ...prev,
@@ -376,6 +385,7 @@ export const UserProvider = ({ children }) => {
       getLeaderboard,
       showNotification,
       toggleTheme,
+      emergencySave,
       isOnline,
     }}>
       {children}

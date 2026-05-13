@@ -14,7 +14,7 @@ const EXERCISE_CONFIG = [
 ];
 
 const LevelSelector = () => {
-  const { userData, isLevelUnlocked, jumpToLevel } = useUser();
+  const { userData, isLevelUnlocked, jumpToLevel, showNotification } = useUser();
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState('article');
   
@@ -27,7 +27,8 @@ const LevelSelector = () => {
     const levelKey = `level${level}`;
     const progress = currentLevels[levelKey] || { correct: 0, total: 0, errors: [] };
     const isUnlocked = isLevelUnlocked(selectedType, level);
-    const completed = progress.total >= 10 && (progress.correct / progress.total) >= 0.8;
+    // Correction : 5 exercices par niveau (au lieu de 10)
+    const completed = progress.total >= 5 && (progress.correct / progress.total) >= 0.8;
     const stars = progress.total > 0 ? Math.floor((progress.correct / progress.total) * 3) : 0;
     const successRate = progress.total > 0 ? Math.round((progress.correct / progress.total) * 100) : 0;
     
@@ -36,8 +37,14 @@ const LevelSelector = () => {
   
   const handlePlayLevel = (level) => {
     const status = getLevelStatus(level);
+    
     if (status.isUnlocked) {
+      // ✅ CORRECTION : navigation correcte vers le niveau
       navigate(`/exercises?type=${selectedType}&level=${level}`);
+    } else {
+      // ✅ AJOUT : message si niveau non débloqué
+      const prevLevel = level - 1;
+      showNotification(`❌ Niveau ${level} non débloqué ! Terminez le niveau ${prevLevel} avec 80% de réussite d'abord.`, 'error');
     }
   };
   
@@ -57,7 +64,7 @@ const LevelSelector = () => {
       {/* En-tête */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">🗺️ Sélection des niveaux</h1>
-        <p className="text-gray-400 text-sm mb-4">Chaque niveau nécessite 80% de réussite pour débloquer le suivant</p>
+        <p className="text-gray-400 text-sm mb-4">Chaque niveau nécessite 80% de réussite (4/5) pour débloquer le suivant</p>
         
         {/* Stats utilisateur */}
         <div className="grid grid-cols-3 gap-3 mb-4">
@@ -111,6 +118,9 @@ const LevelSelector = () => {
           📚 <span className="text-white font-medium">{currentConfig?.name}</span> — 
           Niveau actuel : <span className="text-yellow-400 font-bold">{currentLevelNum}</span>/50
         </p>
+        <p className="text-xs text-gray-500 mt-1">
+          💡 Cliquez sur un niveau pour commencer à jouer
+        </p>
       </div>
       
       {/* Grille des niveaux */}
@@ -141,6 +151,7 @@ const LevelSelector = () => {
                 ${bgClass}
                 ${status.isUnlocked ? 'hover:scale-105 cursor-pointer' : 'cursor-not-allowed opacity-50'}
               `}
+              title={status.isUnlocked ? `Jouer niveau ${level}` : `Niveau ${level} verrouillé (terminez d'abord le niveau ${level-1} à 80%)`}
             >
               <span className={`text-base font-bold ${textClass}`}>{level}</span>
               
@@ -168,11 +179,11 @@ const LevelSelector = () => {
       <div className="mt-6 flex flex-wrap gap-4 justify-center text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 bg-yellow-500/30 rounded border border-yellow-500/50"></div>
-          <span className="text-gray-400">Débloqué</span>
+          <span className="text-gray-400">Débloqué (peut jouer)</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 bg-green-500/30 rounded border border-green-500/50 ring-1 ring-green-500"></div>
-          <span className="text-gray-400">Complété (80%)</span>
+          <span className="text-gray-400">Complété (80% atteint)</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 bg-[#1c2030] rounded border border-[#2a2e3a]"></div>
@@ -180,8 +191,15 @@ const LevelSelector = () => {
         </div>
         <div className="flex items-center gap-1.5">
           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-          <span className="text-gray-400">Étoiles</span>
+          <span className="text-gray-400">Étoiles de réussite</span>
         </div>
+      </div>
+      
+      {/* Message d'aide */}
+      <div className="mt-6 p-3 bg-[#1c2030] rounded-xl text-center">
+        <p className="text-xs text-gray-400">
+          ⚡ <span className="text-yellow-400">Conseil :</span> Terminez 5 exercices avec 80% de réussite (4/5) pour débloquer le niveau suivant.
+        </p>
       </div>
     </div>
   );
