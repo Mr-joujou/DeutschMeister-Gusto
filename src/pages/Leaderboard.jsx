@@ -1,35 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
-import { Trophy, Medal, User, Zap, TrendingUp, RefreshCw } from 'lucide-react';
+import { Trophy, Medal, User, Zap, TrendingUp, RefreshCw, Crown, Award } from 'lucide-react';
 
 const Leaderboard = () => {
-  const { userData } = useUser();
+  const { userData, getLeaderboard, updateLeaderboard } = useUser();
   const [leaderboard, setLeaderboard] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [period, setPeriod] = useState('all'); // 'all', 'week', 'month'
 
-  // Simuler un classement (pour l'instant, basé sur localStorage)
-  // Dans une vraie version Firebase, tu récupères depuis Firestore
+  // Données mockées pour démonstration (à remplacer par des données réelles)
+  const mockUsers = [
+    { name: 'Abdellah', xp: 2840, level: 28, accuracy: 92 },
+    { name: 'Sophia', xp: 2150, level: 22, accuracy: 88 },
+    { name: 'Mehdi', xp: 1890, level: 19, accuracy: 85 },
+    { name: 'Youssef', xp: 1560, level: 16, accuracy: 82 },
+    { name: 'Fatima', xp: 1420, level: 14, accuracy: 79 },
+    { name: 'Ilias', xp: 1280, level: 13, accuracy: 76 },
+    { name: 'Nadia', xp: 1150, level: 12, accuracy: 74 },
+    { name: 'Omar', xp: 980, level: 10, accuracy: 71 },
+    { name: 'Leila', xp: 890, level: 9, accuracy: 68 },
+    { name: 'Hicham', xp: 760, level: 8, accuracy: 65 },
+  ];
+
   useEffect(() => {
-    // Simulation de classement
-    const mockLeaderboard = [
-      { name: 'Maximilian', xp: 1250, level: 12, accuracy: 85 },
-      { name: 'Sophia', xp: 980, level: 9, accuracy: 78 },
-      { name: 'Lukas', xp: 760, level: 7, accuracy: 72 },
-      { name: userData.userName || 'Vous', xp: userData.xp, level: userData.currentLevel, accuracy: userData.totalAnswers > 0 ? Math.round((userData.totalCorrect / userData.totalAnswers) * 100) : 0, isCurrentUser: true },
-      { name: 'Anna', xp: 540, level: 5, accuracy: 68 },
-      { name: 'Felix', xp: 320, level: 3, accuracy: 62 },
-    ];
+    // Fusion des données utilisateur réel avec les mockés
+    const realUser = {
+      name: userData.userName || 'Gustave A.',
+      xp: userData.xp,
+      level: userData.currentLevel,
+      accuracy: userData.totalAnswers > 0 ? Math.round((userData.totalCorrect / userData.totalAnswers) * 100) : 0,
+      isCurrentUser: true,
+    };
     
-    // Trier par XP
-    const sorted = [...mockLeaderboard].sort((a, b) => b.xp - a.xp);
-    setLeaderboard(sorted);
+    // Mélanger et trier
+    let allUsers = [...mockUsers, realUser];
+    allUsers.sort((a, b) => b.xp - a.xp);
+    
+    setLeaderboard(allUsers.slice(0, 20));
     setIsLoading(false);
   }, [userData]);
 
   const getRankIcon = (rank) => {
-    if (rank === 0) return <Trophy className="w-5 h-5 text-yellow-400" />;
-    if (rank === 1) return <Medal className="w-5 h-5 text-gray-400" />;
-    if (rank === 2) return <Medal className="w-5 h-5 text-orange-400" />;
+    if (rank === 0) return <Crown className="w-5 h-5 text-yellow-500" />;
+    if (rank === 1) return <Medal className="w-5 h-5 text-gray-300" />;
+    if (rank === 2) return <Medal className="w-5 h-5 text-amber-600" />;
+    return null;
+  };
+
+  const getRankBadge = (rank) => {
+    if (rank === 0) return <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold">🏆 1er</span>;
+    if (rank === 1) return <span className="px-2 py-0.5 bg-gray-500/20 text-gray-300 rounded-full text-xs font-bold">🥈 2e</span>;
+    if (rank === 2) return <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs font-bold">🥉 3e</span>;
     return null;
   };
 
@@ -41,37 +62,55 @@ const Leaderboard = () => {
     );
   }
 
+  const userRank = leaderboard.findIndex(u => u.name === userData.userName || u.isCurrentUser) + 1;
+
   return (
     <div className="max-w-2xl mx-auto pb-20">
       {/* En-tête */}
       <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl p-6 border border-yellow-500/30 mb-6 text-center">
         <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
-        <h1 className="text-2xl font-bold mb-2">Classement</h1>
+        <h1 className="text-2xl font-bold mb-2">🏆 Classement</h1>
         <p className="text-gray-400 text-sm">Comparez votre progression avec les autres apprenants</p>
       </div>
 
+      {/* Filtres période */}
+      <div className="flex gap-2 mb-4 justify-center">
+        <button onClick={() => setPeriod('all')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${period === 'all' ? 'bg-yellow-500 text-black' : 'bg-[#1c2030] text-gray-400 hover:bg-[#242840]'}`}>
+          🌍 Tous
+        </button>
+        <button onClick={() => setPeriod('week')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${period === 'week' ? 'bg-yellow-500 text-black' : 'bg-[#1c2030] text-gray-400 hover:bg-[#242840]'}`}>
+          📅 Cette semaine
+        </button>
+        <button onClick={() => setPeriod('month')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${period === 'month' ? 'bg-yellow-500 text-black' : 'bg-[#1c2030] text-gray-400 hover:bg-[#242840]'}`}>
+          📆 Ce mois
+        </button>
+      </div>
+
       {/* Stats personnelles */}
-      <div className="bg-[#151820] border border-[#2a2e3a] rounded-xl p-4 mb-6">
+      <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm text-gray-400">Votre position</span>
-          <span className="text-sm text-yellow-400 font-bold">
-            #{leaderboard.findIndex(u => u.isCurrentUser) + 1} / {leaderboard.length}
-          </span>
+          <div className="flex items-center gap-2">
+            {getRankBadge(userRank - 1)}
+            <span className="text-sm text-yellow-400 font-bold">
+              #{userRank} / {leaderboard.length}
+            </span>
+          </div>
         </div>
         <div className="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <User className="w-4 h-4 text-blue-400 mx-auto mb-1" />
+            <span className="text-lg font-bold text-white">{userData.userName || 'Gustave A.'}</span>
+            <p className="text-xs text-gray-500">Apprenant</p>
+          </div>
           <div>
             <Zap className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
             <span className="text-lg font-bold text-yellow-400">{userData.xp}</span>
             <p className="text-xs text-gray-500">XP</p>
           </div>
           <div>
-            <TrendingUp className="w-4 h-4 text-blue-400 mx-auto mb-1" />
-            <span className="text-lg font-bold text-blue-400">{userData.currentLevel}/50</span>
-            <p className="text-xs text-gray-500">Niveau</p>
-          </div>
-          <div>
-            <Medal className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-            <span className="text-lg font-bold text-purple-400">
+            <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
+            <span className="text-lg font-bold text-green-400">
               {userData.totalAnswers > 0 ? Math.round((userData.totalCorrect / userData.totalAnswers) * 100) : 0}%
             </span>
             <p className="text-xs text-gray-500">Précision</p>
@@ -81,7 +120,7 @@ const Leaderboard = () => {
 
       {/* Liste du classement */}
       <div className="bg-[#151820] border border-[#2a2e3a] rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-[#2a2e3a] bg-[#1c2030]">
+        <div className="p-3 border-b border-[#2a2e3a] bg-[#1c2030]">
           <div className="grid grid-cols-12 text-xs text-gray-500 font-medium">
             <div className="col-span-2">Rang</div>
             <div className="col-span-5">Apprenant</div>
@@ -90,22 +129,22 @@ const Leaderboard = () => {
           </div>
         </div>
         
-        <div className="divide-y divide-[#2a2e3a]">
+        <div className="divide-y divide-[#2a2e3a] max-h-96 overflow-y-auto">
           {leaderboard.map((user, idx) => (
             <div 
               key={idx} 
-              className={`p-4 transition ${user.isCurrentUser ? 'bg-yellow-500/10 border-l-2 border-yellow-400' : 'hover:bg-[#1c2030]'}`}
+              className={`p-3 transition ${user.isCurrentUser ? 'bg-yellow-500/10 border-l-2 border-yellow-400' : 'hover:bg-[#1c2030]'}`}
             >
               <div className="grid grid-cols-12 items-center">
                 <div className="col-span-2 flex items-center gap-1">
                   {getRankIcon(idx)}
-                  <span className={`text-sm font-medium ${idx < 3 ? 'font-bold' : ''}`}>
+                  <span className={`text-sm ${idx < 3 ? 'font-bold' : ''}`}>
                     {idx + 1}
                   </span>
                 </div>
                 <div className="col-span-5 flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 flex items-center justify-center text-black text-xs font-bold">
-                    {user.name.charAt(0)}
+                    {user.name.charAt(0).toUpperCase()}
                   </div>
                   <span className={`text-sm ${user.isCurrentUser ? 'text-yellow-400 font-bold' : 'text-gray-300'}`}>
                     {user.name}
@@ -122,6 +161,26 @@ const Leaderboard = () => {
             </div>
           ))}
         </div>
+        
+        {leaderboard.length === 0 && (
+          <div className="p-8 text-center text-gray-500">
+            <p>Aucun classement pour le moment</p>
+            <p className="text-xs mt-2">Complétez des exercices pour apparaître ici !</p>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex justify-between items-center mt-4">
+        <p className="text-xs text-gray-500">
+          💡 Le classement se base sur vos XP totaux. Continuez vos exercices pour grimper dans le classement !
+        </p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="p-2 hover:bg-[#1c2030] rounded-xl transition"
+          title="Rafraîchir"
+        >
+          <RefreshCw className="w-4 h-4 text-gray-400" />
+        </button>
       </div>
     </div>
   );

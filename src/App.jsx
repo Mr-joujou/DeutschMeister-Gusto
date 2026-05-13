@@ -10,6 +10,9 @@ import Leaderboard from './pages/Leaderboard';
 import Games from './pages/Games';
 import Profile from './pages/Profile';
 import SprechenSchreiben from './pages/SprechenSchreiben';
+import ParticipialPage from './pages/ParticipialPage'
+import PassiveGame from './pages/PassiveGame';
+
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="games" element={<Games />} />
           <Route path="profile" element={<Profile />} />
           <Route path="sprechen-schreiben" element={<SprechenSchreiben />} />
+          <Route path="participial" element={<ParticipialPage />} />
+          <Route path="passive-game" element={<PassiveGame />} />
+
         </Route>
       </Routes>
     </UserProvider>

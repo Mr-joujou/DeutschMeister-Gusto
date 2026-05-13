@@ -203,8 +203,7 @@ const ExercisesPage = () => {
     setAnswered(true);
     setShowExplanation(true);
     
-    updateExerciseResult(current.id, correct, answer, current.correctAnswer, current.explanation);
-    if (!correct) setUsedExerciseIds(prev => [...prev, current.id]);
+   updateExerciseResult(exerciseType, current.id, correct, answer, current.correctAnswer, current.explanation);
     
     setTimeout(() => {
       explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });

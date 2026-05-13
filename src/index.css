@@ -5,131 +5,187 @@
 @tailwind utilities;
 
 /* =========================================================
-   VARIABLES GLOBALES
+   VARIABLES GLOBALES - DARK MODE (DÉFAUT)
 ========================================================= */
-
-:root {
-  /* DARK MODE PAR DÉFAUT */
+:root,
+html.dark {
   --bg: #0d0f14;
   --surface: #151820;
   --surface2: #1c2030;
-  --border: #2a2e3a;
-
+  --surface3: #242840;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --radius: 16px;
+  --radius-sm: 8px;
+  
+  /* Couleurs texte */
   --text: #e8eaf0;
-  --text-muted: #a1a1aa;
-  --text-dim: #71717a;
+  --text-muted: #7a8099;
+  --text-dim: #4a5070;
+  
+  /* Couleurs accent */
+  --accent: #f0c040;
+  --accent2: #5b8dee;
+  --accent3: #e05c7a;
+  --success: #3ecf8e;
+  --error: #f04060;
+  
+  /* Composants */
+  --sidebar-bg: #151820;
+  --sidebar-border: #2a2e3a;
+  --header-bg: #151820;
+  --footer-bg: #151820;
 }
 
 /* =========================================================
-   LIGHT MODE
+   LIGHT MODE (CLAIR ÉLÉGANT)
 ========================================================= */
-
 html.light {
-  --bg: #f3f4f6;
+  --bg: #f8f9fc;
   --surface: #ffffff;
-  --surface2: #f9fafb;
-  --border: #d1d5db;
-
-  --text: #111827;
-  --text-muted: #4b5563;
-  --text-dim: #9ca3af;
+  --surface2: #f1f3f7;
+  --surface3: #e8eaef;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.12);
+  
+  /* Couleurs texte */
+  --text: #1a1e2c;
+  --text-muted: #5a607a;
+  --text-dim: #8b91a8;
+  
+  /* Couleurs accent */
+  --accent: #d4a017;
+  --accent2: #4a6fa5;
+  --accent3: #c94f6b;
+  --success: #2c9c6e;
+  --error: #c93a5a;
+  
+  /* Composants */
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e2e6ea;
+  --header-bg: #ffffff;
+  --footer-bg: #ffffff;
 }
 
 /* =========================================================
    BASE
 ========================================================= */
-
 @layer base {
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-
-    -webkit-tap-highlight-color: transparent;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
+  /* Scrollbar */
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
     background: var(--surface2);
+    border-radius: 999px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: var(--text-dim);
     border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
   }
 }
 
 /* =========================================================
-   COMPONENTS
+   TRANSITIONS GLOBALES
 ========================================================= */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
 
+/* =========================================================
+   COMPOSANTS UTILITAIRES
+========================================================= */
 @layer components {
   .glass-effect {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid var(--border);
   }
-
+  
   html.light .glass-effect {
-    background: rgba(255,255,255,0.7);
+    background: rgba(0, 0, 0, 0.02);
   }
 
   .gradient-text {
     @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
   }
 
-  .text-muted {
-    color: var(--text-muted);
-  }
-
-  .text-dim {
-    color: var(--text-dim);
-  }
-
   .surface {
     background: var(--surface);
   }
-
+  
   .surface2 {
     background: var(--surface2);
+  }
+  
+  .surface3 {
+    background: var(--surface3);
+  }
+  
+  .border-custom {
+    border-color: var(--border);
   }
 }
 
 /* =========================================================
    ANIMATIONS
 ========================================================= */
-
-* {
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slideUp 0.3s ease-out;
 }
-/* ============================================================
-   STYLES POUR SPRECHEN & SCHREIBEN
-   ============================================================ */
 
-/* Filtres */
+.animate-shake {
+  animation: shake 0.35s ease;
+}
+
+/* =========================================================
+   STYLES POUR SIDEBAR (mode clair/sombre)
+========================================================= */
+.sidebar-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* =========================================================
+   STYLES POUR SPRECHEN & SCHREIBEN
+========================================================= */
 .filter-chip {
   padding: 6px 14px;
   border-radius: 999px;
@@ -213,32 +269,18 @@ html.light {
   animation: fadeIn 0.2s ease;
 }
 
-/* Animation fadeIn */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
 /* Border left pour situation */
 .border-l-3 {
   border-left-width: 3px;
+}
+
+/* =========================================================
+   STYLES POUR LES MODALES
+========================================================= */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+html.light .modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
 }

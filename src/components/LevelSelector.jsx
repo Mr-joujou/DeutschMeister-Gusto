@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { Lock, Star, BookOpen, Sparkles, Languages, Zap, Shield, AlignLeft, BookMarked } from 'lucide-react';
+import { Lock, CheckCircle, Star, BookOpen, Sparkles, Languages, Zap, Shield, AlignLeft, BookMarked } from 'lucide-react';
 
 const EXERCISE_CONFIG = [
   { id: 'article', name: 'Articles (der/die/das)', icon: BookMarked, color: 'blue', levels: 50 },
@@ -20,9 +20,8 @@ const LevelSelector = () => {
   
   const currentConfig = EXERCISE_CONFIG.find(c => c.id === selectedType);
   
-  // Récupération sécurisée des niveaux (avec fallback)
-  const currentLevelData = userData.levels?.[selectedType] || { currentLevel: 1, levelProgress: {} };
-  const currentLevels = currentLevelData.levelProgress || {};
+  // Récupération sécurisée des niveaux
+  const currentLevels = userData.levels?.[selectedType]?.levelProgress || {};
   
   const getLevelStatus = (level) => {
     const levelKey = `level${level}`;
@@ -51,7 +50,7 @@ const LevelSelector = () => {
   
   // Calcul des points totaux
   const totalXp = userData.xp || 0;
-  const currentLevelNum = currentLevelData.currentLevel || 1;
+  const currentLevelNum = userData.levels?.[selectedType]?.currentLevel || 1;
   
   return (
     <div className="max-w-4xl mx-auto pb-20">

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import logo from '../../assets/logo.png';  // ← IMPORT DE TON LOGO
 import { 
-  LayoutDashboard, 
   BookOpen, 
   Gamepad2, 
   User, 
   Trophy,
-  Flag,
   Zap,
   Target,
   X,
@@ -20,8 +19,7 @@ import {
   Moon,
   Languages,
   Shield,
-  RefreshCw,
-  AlignLeft ,
+  AlignLeft,
   MessageSquare,
 } from 'lucide-react';
 
@@ -30,35 +28,38 @@ const Sidebar = ({ isOpen, onClose }) => {
   const [exercisesOpen, setExercisesOpen] = useState(false);
   const isLight = userData.theme === 'light';
 
+  // Bloquer le scroll du body quand le sidebar mobile est ouvert
   React.useEffect(() => {
     if (isOpen) {
       document.body.classList.add('sidebar-open');
+      document.body.style.overflow = 'hidden';
     } else {
       document.body.classList.remove('sidebar-open');
+      document.body.style.overflow = '';
     }
-    return () => document.body.classList.remove('sidebar-open');
+    return () => {
+      document.body.classList.remove('sidebar-open');
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
-  const menuItems = [
-    { path: '/', label: 'Tableau de bord', icon: LayoutDashboard, color: 'text-blue-400' },
+  const menuItems = [ 
+    { path: '/passive-game', label: 'Exercices Passif', icon: Shield, color: 'text-red-400' },
+    { path: '/participial', label: 'Partizipialsätze', icon: Gamepad2, color: 'text-purple-400' },
+    { path: '/sprechen-schreiben', label: 'Sprechen & Schreiben', icon: MessageSquare, color: 'text-yellow-400' },
     { path: '/levels', label: 'Sélection des niveaux', icon: Map, color: 'text-green-400' },
     { path: '/leaderboard', label: 'Classement', icon: Trophy, color: 'text-yellow-400' },
-    // { path: '/games', label: 'Jeux', icon: Gamepad2, color: 'text-yellow-400' },
     { path: '/profile', label: 'Profil', icon: User, color: 'text-purple-400' },
-    { path: '/sprechen-schreiben', label: 'Sprechen & Schreiben', icon: MessageSquare, color: 'text-yellow-400' },
   ];
 
-  // Types d'exercices disponibles
   const exerciseTypes = [
     { id: 'article', name: 'Articles (der/die/das)', icon: BookMarked, color: 'blue', description: 'Déclinaison des articles' },
     { id: 'adjective', name: 'Adjectifs', icon: Sparkles, color: 'purple', description: 'Déclinaison des adjectifs' },
     { id: 'conjugation', name: 'Conjugaison', icon: Languages, color: 'green', description: 'Conjugaison des verbes' },
     { id: 'modal', name: 'Verbes modaux', icon: Zap, color: 'orange', description: 'können, müssen, dürfen, wollen, sollen' },
-    { id: 'passive', name: 'Passif', icon: Shield, color: 'red', description: 'Voix passive' },
     { id: 'wordorder', name: 'Ordre des mots', icon: AlignLeft, color: 'teal', description: 'Structure de la phrase' },
   ];
 
-  // Fonction pour obtenir les classes CSS en fonction de l'état actif
   const getNavLinkClass = ({ isActive }) => {
     return `flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
       isActive 
@@ -67,7 +68,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     }`;
   };
 
-  // Fonction pour les liens d'exercices
   const getExerciseLinkClass = ({ isActive }, type) => {
     const colorClasses = {
       blue: isActive ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1c2030] hover:text-gray-700 dark:hover:text-gray-200',
@@ -89,23 +89,27 @@ const Sidebar = ({ isOpen, onClose }) => {
         />
       )}
       
+      {/* Sidebar fixe (ne défile pas) */}
       <div className={`
         fixed top-0 left-0 h-full w-72 bg-white dark:bg-[#151820] border-r border-gray-200 dark:border-[#2a2e3a]
-        flex flex-col z-50 transition-transform duration-300 ease-out
+        flex flex-col z-50 transition-transform duration-300 ease-out overflow-y-auto
         ${isOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}
-        lg:relative lg:translate-x-0
+        lg:relative lg:translate-x-0 lg:overflow-y-auto lg:h-screen lg:sticky lg:top-0
       `}>
-        {/* En-tête */}
-        <div className="p-5 border-b border-gray-200 dark:border-[#2a2e3a] flex items-center justify-between">
+        {/* En-tête avec LOGO IMAGE */}
+        <div className="p-5 border-b border-gray-200 dark:border-[#2a2e3a] flex items-center justify-between sticky top-0 bg-white dark:bg-[#151820] z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
-              <Flag className="w-5 h-5 text-black" />
-            </div>
+            {/* Ton logo image */}
+            <img 
+              src={logo} 
+              alt="DeutschMeister Logo" 
+              className="w-10 h-10 rounded-xl object-cover"
+            />
             <div>
               <h1 className="text-lg font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                DeutschMeister
+                Deutsch<span className="text-white">&amp;</span>Meister
               </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-500">Apprendre l'allemand B1</p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">Apprendre l'allemand facilement</p>
             </div>
           </div>
           <button 
@@ -116,10 +120,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Navigation */}
+        {/* Navigation - scrollable si nécessaire */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-1">
-            {/* Menu Exercices avec sous-menu */}
             <div>
               <button
                 onClick={() => setExercisesOpen(!exercisesOpen)}
@@ -162,7 +165,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* Autres menu items */}
             {menuItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -179,8 +181,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           </div>
         </nav>
 
-        {/* Footer : Thème + Objectif */}
-        <div className="p-4 border-t border-gray-200 dark:border-[#2a2e3a] space-y-3">
+        {/* Footer : Thème + Objectif - fixe en bas */}
+        <div className="p-4 border-t border-gray-200 dark:border-[#2a2e3a] space-y-3 sticky bottom-0 bg-white dark:bg-[#151820]">
           <button
             onClick={toggleTheme}
             className="w-full flex items-center justify-between p-3 bg-gray-100 dark:bg-[#1c2030] rounded-xl hover:bg-gray-200 dark:hover:bg-[#242840] transition"
