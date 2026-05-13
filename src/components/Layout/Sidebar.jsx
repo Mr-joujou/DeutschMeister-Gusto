@@ -183,7 +183,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         {/* Footer : Thème + Objectif - fixe en bas */}
         <div className="p-4 border-t border-gray-200 dark:border-[#2a2e3a] space-y-3 sticky bottom-0 bg-white dark:bg-[#151820]">
-          <button
+          {/* <button
             onClick={toggleTheme}
             className="w-full flex items-center justify-between p-3 bg-gray-100 dark:bg-[#1c2030] rounded-xl hover:bg-gray-200 dark:hover:bg-[#242840] transition"
           >
@@ -194,7 +194,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               </span>
             </div>
             <span className="text-xs text-gray-500">{isLight ? '🌙' : '☀️'}</span>
-          </button>
+          </button> */}
 
           <div className="bg-gray-100 dark:bg-[#1c2030] rounded-xl p-3">
             <div className="flex items-center gap-2 mb-2">
